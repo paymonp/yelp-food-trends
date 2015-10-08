@@ -1,16 +1,9 @@
-import json
-import datetime
-import sys
+import json 
 
 def filter_none(line):
 	return True
 
-def load_data(fname):
+def load_data(fname, filter_func=filter_none):
 	f = open(fname, 'r')
-	data = []
 	rawdata = f.readlines()
-	for line in rawdata:
-		data.append(json.loads(line))
-	f.close()
-	return data
-
+	return filter(filter_func, map(json.loads, rawdata))
