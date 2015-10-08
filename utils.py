@@ -2,7 +2,7 @@ import json
 import datetime
 import sys
 
-def filter_none():
+def filter_none(line):
 	return True
 
 def load_data(fname):

@@ -14,4 +14,3 @@ def save_restaurants():
 		f.write(json.dumps(line) + '\n')
 
 save_restaurants()
-	
