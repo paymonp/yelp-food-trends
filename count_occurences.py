@@ -2,6 +2,8 @@ import json
 import datetime
 import sys
 from utils import *
+import food_lib
+
 
 #businesses = load_data("yelp_academic_dataset_business.json")
 #checkins = load_data("yelp_academic_dataset_checkin.json")
@@ -51,10 +53,16 @@ def count_occurrences(query, reviews, time_start=None, time_end=None, business_i
 	return date_counts
 
 
+
 if len(sys.argv) > 1:
+
+	businesses = load_data("food_businesses.json")
+	business_ids = set(food_lib.map_to_arg(food_lib.filter_by_city(businesses, "Las Vegas"), "business_id"))
+
+
 	reviews = load_data("review_test.json")
 	query = sys.argv[1].strip().split(',')
 	count_occurrences(query, reviews)
 
-	date_counts = count_occurrences(query, reviews)
+	date_counts = count_occurrences(query, reviews, business_ids=business_ids)
 	print(sorted(date_counts.items(), key=lambda x: x[1], reverse=True)[0:10])
