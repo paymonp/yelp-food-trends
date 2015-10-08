@@ -1,6 +1,6 @@
 import json 
 
-def filter_none():
+def filter_none(line):
 	return True
 
 def load_data(fname, filter_func=filter_none):
