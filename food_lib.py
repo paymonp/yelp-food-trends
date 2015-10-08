@@ -1,5 +1,5 @@
 import json
-import utils
+from utils import *
 
 def filter_by_city(data, city):
 	def city_filter(line):

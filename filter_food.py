@@ -1,5 +1,5 @@
 import json
-import utils
+from utils import *
 
 def filter_food(line):
 	if 'categories' in line:
@@ -9,9 +9,9 @@ def filter_food(line):
 
 def save_restaurants():
 	data = load_data('yelp_academic_dataset_business.json', filter_food)
-	f = open('food_businesses.json')
+	f = open('food_businesses.json', 'w')
 	for line in data:
-		f.write(line)
+		f.write(json.dumps(line) + '\n')
 
 save_restaurants()
 	
