@@ -12,5 +12,6 @@ def save_restaurants():
 	f = open('food_businesses.json', 'w')
 	for line in data:
 		f.write(json.dumps(line) + '\n')
+	f.close()
 
 save_restaurants()
