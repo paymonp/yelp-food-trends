@@ -32,7 +32,6 @@ def eval_model(pred, test):
 """
 def crossvalidate(X, y):
 
-	features = ['count', 'hours', 'Take-out', 'Accepts Credit Cards', 'Drive-Thru', 'Outdoor Seating', 'Delivery', 'Has TV', 'Takes Reservations', 'Good for Kids', 'Good For Groups']
 	print("NUM FEATURES", len(features))
 	print("NUM FEATURES IN DATA MATRIX", X.shape[1])
 
@@ -83,21 +82,22 @@ def score(X, labels, model):
 	total = len(acc_scores)
 	return correct, total
 
+features = ['count', 'hours', 'Take-out', 'Accepts Credit Cards', 'Drive-Thru', 'Outdoor Seating', 'Delivery', 'Has TV', 'Takes Reservations', 'Good for Kids', 'Good For Groups']
+
 def get_top_5_coef(model):
 	coef = model.coef_
 	indices = list(np.argsort(coef))
 	print("High weights")
 	for i in indices[-5:]:
-		print(i)
+		#print(i)
 		print(features[i], coef[i])
+	print('\n')
 	
 def get_bottom_5_coef(model):
 	coef = model.coef_
 	indices = list(np.argsort(coef))
-	print('\n')
 	print("Low weights")
 	for i in indices[0:5]:
-		print(i)
 		print(features[i], coef[i])
 	print('\n')
 
@@ -114,8 +114,12 @@ def run_experiment():
 		labels, training_data = selective_featurize(['attributes', 'count', 'hours'], path=fname)
 		labels = np.array(labels)
 		training_data = np.array(training_data)
-		model = lasso(training_data, labels)
+		model = linreg(training_data, labels)
 		models[city] = model
+		print(city)
+		get_top_5_coef(model)
+		get_bottom_5_coef(model)
+
 
 	correct = 0.
 	total = 0.
@@ -140,8 +144,8 @@ def run_experiment():
 	labels, training_data = selective_featurize(['attributes', 'count', 'hours'], path=fname)
 	labels = np.array(labels)
 	training_data = np.array(training_data)
-	model = lasso(training_data, labels)
-	
+	model = linreg(training_data, labels)
+
 	fname = "validation/sample.txt"
 	labels, testing_data = selective_featurize(['attributes', 'count', 'hours'], path=fname)
 	labels = np.array(labels)
