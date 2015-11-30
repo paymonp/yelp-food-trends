@@ -19,7 +19,7 @@ import env
 
 _MINUTES_AVG = 84 * 60
 
-def selective_featurize(picks):
+def selective_featurize(picks, path=env.SAMPLE_PATH):
   # everything returns an int except :attributes
   hashers = {
     'attributes': attributes_hash,
@@ -36,7 +36,7 @@ def selective_featurize(picks):
       print 'Invalid argument to feature selector: must be out of: ', hashers.keys()
       return
 
-  with open(env.SAMPLE_PATH, 'r') as input:
+  with open(path, 'r') as input:
     for line in input:
       biz = json.loads(line)
       vec = []
