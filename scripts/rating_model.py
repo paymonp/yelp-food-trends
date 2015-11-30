@@ -29,6 +29,7 @@ def eval_model(pred, test):
 	return np.sum(diff) / float(pred.shape[0])
 
 
+"""
 def crossvalidate(X, y):
 
 	features = ['count', 'hours', 'Take-out', 'Accepts Credit Cards', 'Drive-Thru', 'Outdoor Seating', 'Delivery', 'Has TV', 'Takes Reservations', 'Good for Kids', 'Good For Groups']
@@ -51,24 +52,10 @@ def crossvalidate(X, y):
 		mse_scores.append(mse)
 		acc_scores.append(eval_model(pred, ytest))
 
-		"""
-		coef = model.coef_
-		indices = list(np.argsort(coef))
-		print("High weights")
-		for i in indices[-5:]:
-			print(i)
-			print(features[i], coef[i])
-		print('\n')
-		print("Low weights")
-		for i in indices[0:5]:
-			print(i)
-			print(features[i], coef[i])
 
-		print('\n')
-		"""
 	print(sum(acc_scores)/float(len(acc_scores)))
 	print(sum(mse_scores)/float(len(mse_scores)))
-
+"""
 
 def linreg(X, y):
 	model = linear_model.LinearRegression()
@@ -86,23 +73,84 @@ def lasso(X, y):
 	model.fit(X, y)
 	return model
 
+def score(X, labels, model):
+	acc_scores = []
+	pred = model.predict(X)
+	pred = np.reshape(pred, (pred.shape[0], 1))
+	pred = np.apply_along_axis(half_int_round, axis=1, arr=pred)
+	acc_scores.append(eval_model(pred, labels))
+	correct = sum(acc_scores)
+	total = len(acc_scores)
+	return correct, total
+
+def get_top_5_coef(model):
+	coef = model.coef_
+	indices = list(np.argsort(coef))
+	print("High weights")
+	for i in indices[-5:]:
+		print(i)
+		print(features[i], coef[i])
+	
+def get_bottom_5_coef(model):
+	coef = model.coef_
+	indices = list(np.argsort(coef))
+	print('\n')
+	print("Low weights")
+	for i in indices[0:5]:
+		print(i)
+		print(features[i], coef[i])
+	print('\n')
 
 # ... load data somewhow
 
 def run_experiment():
 	# EXP 1: Get geopgrahic specific classifiers
-	files = glob.glob('')
+	files = glob.glob('training/divided/*.txt')
+	models = {}
+
 	for fname in files:
+		# TODO: Write a regex to parse through the fname
+		_, city = fname.split('/')[-1].split('-')
 		labels, training_data = selective_featurize(['attributes', 'count', 'hours'], path=fname)
 		labels = np.array(labels)
 		training_data = np.array(training_data)
-		model = train(training_data, labels)
+		model = lasso(training_data, labels)
+		models[city] = model
+
+	correct = 0.
+	total = 0.
+
+	files = glob.glob('validation/divided/*.txt')
+	for fname in files:
+		_, city = fname.split('/')[-1].split('-')
+		labels, testing_data = selective_featurize(['attributes', 'count', 'hours'], path=fname)
+		labels = np.array(labels)
+		testing_data = np.array(testing_data)
+		model = models[city]
+		curr_correct, curr_total = score(testing_data, labels, model)
+		correct += curr_correct
+		total += curr_total
+		print(city, curr_correct/float(curr_total))
+
+	print("Geographically divided classifier accuracy: " + str(correct/total))
+
 
 	#Exp 2: Get overall classifier
-	fname = "something here"
+	fname = "training/sample.txt"
 	labels, training_data = selective_featurize(['attributes', 'count', 'hours'], path=fname)
 	labels = np.array(labels)
 	training_data = np.array(training_data)
-	crossvalidate(training_data, labels)
+	model = lasso(training_data, labels)
+	
+	fname = "validation/sample.txt"
+	labels, testing_data = selective_featurize(['attributes', 'count', 'hours'], path=fname)
+	labels = np.array(labels)
+	testing_data = np.array(testing_data)
+	correct, total = score(testing_data, labels, model)
+	print("Non-divided classifier accuracy: " + str(float(correct)/total))
+
+run_experiment()
+
+
 
 
